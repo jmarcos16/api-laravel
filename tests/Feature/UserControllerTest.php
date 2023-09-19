@@ -42,5 +42,12 @@ it('should be able to create a new user', function () {
     assertDatabaseHas('users', ['email' => 'test@tess.com']);
     assertDatabaseCount('users', 1);
 
+});
 
+test('validate if name is require to create a new user', function () {
+    postJson(route('users.create'), [
+        'email' => 'test@test.com',
+        'password' => '123456',
+        'confirm_password' => '123456'
+    ])->assertJsonValidationErrors('name');
 });
