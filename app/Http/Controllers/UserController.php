@@ -24,7 +24,7 @@ class UserController extends Controller
     {
 
         request()->validate([
-            'name' => 'required',
+            'name' => ['required', 'string', 'max:255'],
             'email' => 'required',
             'password' => 'required',
             'confirm_password' => 'required|same:password',

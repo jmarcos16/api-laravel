@@ -51,3 +51,23 @@ test('validate if name is require to create a new user', function () {
         'confirm_password' => '123456'
     ])->assertJsonValidationErrors('name');
 });
+
+
+test('validate if name is string to create a new user', function () {
+    postJson(route('users.create'), [
+        'name' => 123,
+        'email' => 'test@test.com',
+        'password' => '123456',
+        'confirm_password' => '123456'
+    ])->assertJsonValidationErrors('name');
+});
+
+
+test('validate if name contains max 255 character', function () {
+    postJson(route('users.create'), [
+        'name' => str_repeat('a', 256),
+        'email' => 'test@test.com',
+        'password' => '123456',
+        'confirm_password' => '123456'
+    ])->assertJsonValidationErrors('name');
+});
