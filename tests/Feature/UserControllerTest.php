@@ -4,6 +4,7 @@ use App\Models\User;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\deleteJson;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
@@ -253,3 +254,24 @@ test('validate if email is unique to update a user', function () {
 
     assertCount(1, User::where('email', $user1->email)->get());
 });
+
+
+test('validate if email contains max 255 character to update a user', function () {
+    $user = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'name' => 'Fake Name',
+        'email' => str_repeat('a', 256) . "@tes.com",
+    ])->assertJsonValidationErrors('email');
+
+    assertDatabaseHas('users', ['email' => $user->email]);
+});
+
+
+it('should be able to delete a user', function () {
+    $user = User::factory()->create();
+    $response = deleteJson(route('users.delete', ['user' => $user->id]));
+    $response->assertNoContent();
+    assertDatabaseCount('users', 0);
+});
+
