@@ -5,7 +5,6 @@ use App\Models\User;
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
-use function Pest\Laravel\post;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
 
@@ -171,7 +170,7 @@ it('should be able  find a user by id', function () {
 
 it('should be able update a user', function () {
     $user = User::factory()->create();
-    $response = postJson(route('users.update', ['user' => $user->id]), [
+    $response = putJson(route('users.update', ['user' => $user->id]), [
         'name' => 'John Doe',
         'email' => 'test@dwindiuo'
     ]);
