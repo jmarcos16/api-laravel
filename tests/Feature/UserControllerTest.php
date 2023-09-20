@@ -6,6 +6,7 @@ use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
+use function Pest\Laravel\putJson;
 
 it('should be list all users', function () {
     User::factory()->count(10)->create();
@@ -152,3 +153,36 @@ test('validate if confirm_password is same as password to create a new user', fu
     ])->assertJsonValidationErrors('confirm_password');
 });
 
+
+it('should be able  find a user by id', function () {
+    $user = User::factory()->create();
+    $response = getJson(route('users.find', ['user' => $user->id]))->assertOk();
+    $response->assertJsonStructure([
+        'data' => [
+            'id',
+            'name',
+            'email',
+            'updated_at',
+        ],
+    ]);
+});
+
+
+it('should be able update a user', function () {
+    $user = User::factory()->create();
+    $response = putJson(route('users.update', ['user' => $user->id]), [
+        'name' => 'John Doe',
+        'email' => 'test@dwindiuo'
+    ])->assertOk();
+
+    $response->assertJsonStructure([
+        'data' => [
+            'id',
+            'name',
+            'email',
+            'updated_at',
+        ],
+    ]);
+
+    assertDatabaseHas('users', ['email' => 'test@dwindiuo']);
+});
