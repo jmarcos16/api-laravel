@@ -7,6 +7,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\getJson;
 use function Pest\Laravel\postJson;
 use function Pest\Laravel\putJson;
+use function PHPUnit\Framework\assertCount;
 
 it('should be list all users', function () {
     User::factory()->count(10)->create();
@@ -186,4 +187,69 @@ it('should be able update a user', function () {
 
     assertDatabaseHas('users', ['email' => 'test@dwindiuo']);
     assertDatabaseCount('users', 1);
+});
+
+test('validate if name is require to update a user', function () {
+    $user = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'email' => 'test@dwindiuo'
+    ])->assertJsonValidationErrors('name');
+
+    assertDatabaseHas('users', ['email' => $user->email]);
+});
+
+test('validate if name is string to update a user', function () {
+    $user = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'name' => 123,
+        'email' => 'test@dwindiuo'
+    ])->assertJsonValidationErrors('name');
+
+    assertDatabaseHas('users', ['email' => $user->email]);
+});
+
+test('validate if name contains max 255 character to update a user', function () {
+    $user = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'name' => str_repeat('a', 256),
+        'email' => 'test@dwindiuo'
+    ])->assertJsonValidationErrors('name');
+
+    assertDatabaseHas('users', ['email' => $user->email]);
+});
+
+test('validate if email is require to update a user', function () {
+    $user = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'name' => 'Fake Name',
+    ])->assertJsonValidationErrors('email');
+
+    assertDatabaseHas('users', ['email' => $user->email]);
+});
+
+test('validate if email is valid to update a user', function () {
+    $user = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'name' => 'Fake Name',
+        'email' => 'duawidnai',
+    ])->assertJsonValidationErrors('email');
+
+    assertDatabaseHas('users', ['email' => $user->email]);
+});
+
+test('validate if email is unique to update a user', function () {
+    $user = User::factory()->create();
+    $user1 = User::factory()->create();
+
+    putJson(route('users.update', ['user' => $user->id]), [
+        'name' => 'Fake Name',
+        'email' => $user1->email,
+    ])->assertJsonValidationErrors('email');
+
+    assertCount(1, User::where('email', $user1->email)->get());
 });
