@@ -12,7 +12,7 @@ use function PHPUnit\Framework\assertCount;
 
 it('should be list all users', function () {
     User::factory()->count(10)->create();
-    $response = getJson(route('users.list'))->assertOk();
+    $response = getJson(route('users.index'))->assertOk();
     $response->assertJsonStructure([
         'data' => [
             '*' => [
@@ -26,7 +26,7 @@ it('should be list all users', function () {
 });
 
 it('should be able to create a new user', function () {
-    $response = postJson(route('users.create'), [
+    $response = postJson(route('users.store'), [
         'name' => 'John Doe',
         'email' => 'test@tess.com',
         'password' => '123456',
@@ -48,7 +48,7 @@ it('should be able to create a new user', function () {
 });
 
 test('validate if name is require to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'email' => 'test@test.com',
         'password' => '123456',
         'confirm_password' => '123456'
@@ -57,7 +57,7 @@ test('validate if name is require to create a new user', function () {
 
 
 test('validate if name is string to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 123,
         'email' => 'test@test.com',
         'password' => '123456',
@@ -67,7 +67,7 @@ test('validate if name is string to create a new user', function () {
 
 
 test('validate if name contains max 255 character', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => str_repeat('a', 256),
         'email' => 'test@test.com',
         'password' => '123456',
@@ -76,7 +76,7 @@ test('validate if name contains max 255 character', function () {
 });
 
 test('validate if email is require to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'password' => '123456',
         'confirm_password' => '123456'
@@ -84,7 +84,7 @@ test('validate if email is require to create a new user', function () {
 });
 
 test('validate if email is valid to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'email' => 'duawidnai',
         'password' => '123456',
@@ -95,7 +95,7 @@ test('validate if email is valid to create a new user', function () {
 test('validate if email is unique to create a new user', function () {
     User::factory()->create(['email' => 'test@test.com']);
 
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'email' => 'test@test.com',
         'password' => '123456',
@@ -104,7 +104,7 @@ test('validate if email is unique to create a new user', function () {
 });
 
 test('validate if email contains max 255 character', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'email' => str_repeat('a', 256) . "@tes.com",
         'password' => '123456',
@@ -113,7 +113,7 @@ test('validate if email contains max 255 character', function () {
 });
 
 test('validate if password is require to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'email' => 'test@test.com',
         'confirm_password' => '123456'
@@ -121,7 +121,7 @@ test('validate if password is require to create a new user', function () {
 });
 
 test('validate if password contains min 6 character', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'email' => 'test@test.com',
         'password' => '123',
@@ -130,7 +130,7 @@ test('validate if password contains min 6 character', function () {
 });
 
 test('validate if password contains max 255 character', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'Fake Name',
         'email' => 'test@test.com',
         'password' => str_repeat('a', 256),
@@ -139,7 +139,7 @@ test('validate if password contains max 255 character', function () {
 });
 
 test('validate if confirm_password is require to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'John Doe',
         'email' => 'test@tess.com',
         'password' => '123456'
@@ -147,7 +147,7 @@ test('validate if confirm_password is require to create a new user', function ()
 });
 
 test('validate if confirm_password is same as password to create a new user', function () {
-    postJson(route('users.create'), [
+    postJson(route('users.store'), [
         'name' => 'John Doe',
         'email' => 'test@tess.com',
         'password' => '123456',
@@ -158,7 +158,7 @@ test('validate if confirm_password is same as password to create a new user', fu
 
 it('should be able  find a user by id', function () {
     $user = User::factory()->create();
-    $response = getJson(route('users.find', ['user' => $user->id]))->assertOk();
+    $response = getJson(route('users.show', ['user' => $user->id]))->assertOk();
     $response->assertJsonStructure([
         'data' => [
             'id',
@@ -270,7 +270,7 @@ test('validate if email contains max 255 character to update a user', function (
 
 it('should be able to delete a user', function () {
     $user = User::factory()->create();
-    $response = deleteJson(route('users.delete', ['user' => $user->id]));
+    $response = deleteJson(route('users.destroy', ['user' => $user->id]));
     $response->assertNoContent();
     assertDatabaseCount('users', 0);
 });
