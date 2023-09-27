@@ -6,6 +6,7 @@ use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -23,7 +24,7 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        request()->validate([
+        $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'unique:users', 'max:255'],
             'password' => ['required', 'min:6', 'max:255'],
@@ -31,9 +32,9 @@ class UserController extends Controller
         ]);
 
         $user = User::create([
-            'name' => request('name'),
-            'email' => request('email'),
-            'password' => Hash::make(request('password'))
+            'name' => $request->get('name'),
+            'email' => $request->get('email'),
+            'password' => Hash::make($request->get('password'))
         ]);
 
         return new UserResource($user);
@@ -50,17 +51,17 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(User $user)
+    public function update(User $user, Request $request)
     {
 
-        request()->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', "unique:users,email,{$user->id}", 'max:255'],
+        $request->validate([
+            'name' => ['string', 'max:255'],
+            'email' => ['email', Rule::unique('users')->ignore($user->id), 'max:255'],
         ]);
 
         $user->update([
-            'name' => request('name'),
-            'email' => request('email'),
+            'name' => $request->only('name'),
+            'email' => $request->only('email'),
         ]);
 
         return new UserResource($user);
