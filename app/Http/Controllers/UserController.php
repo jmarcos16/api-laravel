@@ -45,6 +45,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        // dd(request()->header());
         return new UserResource($user);
     }
 
