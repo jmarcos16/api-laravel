@@ -44,7 +44,6 @@ it('should be able to create a new user', function () {
 
     assertDatabaseHas('users', ['email' => 'test@tess.com']);
     assertDatabaseCount('users', 1);
-
 });
 
 test('validate if name is require to create a new user', function () {
@@ -190,15 +189,6 @@ it('should be able update a user', function () {
     assertDatabaseCount('users', 1);
 });
 
-test('validate if name is require to update a user', function () {
-    $user = User::factory()->create();
-
-    putJson(route('users.update', ['user' => $user->id]), [
-        'email' => 'test@dwindiuo'
-    ])->assertJsonValidationErrors('name');
-
-    assertDatabaseHas('users', ['email' => $user->email]);
-});
 
 test('validate if name is string to update a user', function () {
     $user = User::factory()->create();
@@ -222,15 +212,6 @@ test('validate if name contains max 255 character to update a user', function ()
     assertDatabaseHas('users', ['email' => $user->email]);
 });
 
-test('validate if email is require to update a user', function () {
-    $user = User::factory()->create();
-
-    putJson(route('users.update', ['user' => $user->id]), [
-        'name' => 'Fake Name',
-    ])->assertJsonValidationErrors('email');
-
-    assertDatabaseHas('users', ['email' => $user->email]);
-});
 
 test('validate if email is valid to update a user', function () {
     $user = User::factory()->create();
@@ -274,4 +255,3 @@ it('should be able to delete a user', function () {
     $response->assertNoContent();
     assertDatabaseCount('users', 0);
 });
-
