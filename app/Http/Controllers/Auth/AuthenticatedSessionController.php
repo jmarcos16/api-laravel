@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -13,16 +13,13 @@ class AuthenticatedSessionController extends Controller
      */
     public function __invoke(Request $request)
     {
-
         $request->validate([
             'email' => ['required', 'email', 'exists:users'],
             'password' => ['required'],
         ]);
 
         if (!auth()->attempt($request->only('email', 'password'))) {
-            return response()->json([
-                'message' => 'Invalid login details'
-            ], 401);
+            abort(401, 'Invalid credentials');
         }
 
         $token = $request->user()->createToken('auth_token')->plainTextToken;
