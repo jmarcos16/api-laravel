@@ -55,15 +55,12 @@ class UserController extends Controller
     public function update(User $user, Request $request)
     {
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => ['string', 'max:255'],
             'email' => ['email', Rule::unique('users')->ignore($user->id), 'max:255'],
         ]);
 
-        $user->update([
-            'name' => $request->only('name'),
-            'email' => $request->only('email'),
-        ]);
+        $user->update($validated);
 
         return new UserResource($user);
     }
